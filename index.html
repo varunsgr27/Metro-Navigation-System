@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MetroFare</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="logo">🚇 MetroFare</div>
+    <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#calculator">Fare Calculator</a></li>
+        <li><a href="#about">About</a></li>
+    </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <h1>🚇 Metro Navigation System</h1>
+    <p>Find routes, fares and stations in real-time</p>
+</section>
+
+<!-- CALCULATOR -->
+<section id="calculator" class="calculator-section">
+
+    <!-- VIDEO BACKGROUND -->
+    <video autoplay muted loop playsinline id="bg-video">
+        <source src="metrovedio.mp4" type="video/mp4">
+    </video>
+
+    <!-- CARD -->
+    <div class="card">
+        <h2>Fare Calculator</h2>
+
+        <label>From Station</label>
+        <select id="from"></select>
+
+        <label>To Station</label>
+        <select id="to"></select>
+
+        <button onclick="swapStations()">⇄ Swap Stations</button>
+        <button onclick="calculateFare()">Calculate Fare</button>
+        <button onclick="clearData()">Clear</button>
+        <button onclick="playWelcome()">🔊 Play Welcome</button>
+
+        <div id="result" class="result-box"></div>
+    </div>
+
+</section>
+
+<!-- AUDIO -->
+<audio id="welcomeAudio">
+    <source src="welcome.mp3" type="audio/mpeg">
+</audio>
+
+<!-- MAP -->
+<section class="map">
+    <h2>Metro Map</h2>
+    <div id="map"></div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="about">
+    <h2>About Project</h2>
+    <p>
+        This Metro Navigation System uses real station data, interactive maps, 
+        and route calculation to simulate a real metro system.
+    </p>
+</section>
+
+<!-- DATA FILE -->
+<script src="station.js"></script>
+
+<!-- MAIN SCRIPT -->
+<script src="script.js"></script>
+
+</body>
+</html>

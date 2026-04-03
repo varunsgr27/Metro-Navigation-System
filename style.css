@@ -1,0 +1,128 @@
+body {
+    margin: 0;
+    font-family: Arial;
+}
+
+/* NAVBAR */
+.navbar {
+    background: rgba(0,0,0,0.7);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 40px;
+    backdrop-filter: blur(10px);
+}
+
+.navbar ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+}
+
+/* HERO */
+.hero {
+    text-align: center;
+    padding: 80px 20px;
+    color: white;
+    background: linear-gradient(to right, #2f6edb, #1aa3d8);
+}
+
+/* CALCULATOR SECTION */
+.calculator-section {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* VIDEO BACKGROUND */
+#bg-video {
+    position: absolute;   /* IMPORTANT */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+/* DARK OVERLAY */
+.calculator-section::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1;
+}
+
+/* CARD */
+.card {
+    position: relative;
+    z-index: 2;
+
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    width: 350px;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+/* INPUT + BUTTON */
+select, button {
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+}
+
+/* BUTTON STYLE */
+button {
+    background: linear-gradient(45deg, #007bff, #00c6ff);
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+/* RESULT BOX */
+.result-box {
+    background: rgba(255,255,255,0.2);
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 8px;
+}
+
+/* MAP */
+.map {
+    text-align: center;
+    padding: 50px;
+}
+
+#map {
+    width: 95%;
+    height: 500px;
+    margin: 30px auto;
+    border-radius: 15px;
+}
+
+/* ABOUT */
+.about {
+    background: #f2f2f2;
+    padding: 30px;
+    margin: 20px;
+    border-radius: 10px;
+}
