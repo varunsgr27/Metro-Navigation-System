@@ -1,89 +1,346 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" data-theme="dark">
 <head>
-    <title>MetroFare</title>
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="style.css">
-
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MetroFare — Bengaluru Metro</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
+<!-- PRELOADER -->
+<div id="preloader">
+  <div class="preloader-inner">
+    <div class="metro-icon">🚇</div>
+    <div class="preloader-bar"><div class="preloader-fill"></div></div>
+    <p class="preloader-text">Loading MetroFare...</p>
+  </div>
+</div>
+
 <!-- NAVBAR -->
-<nav class="navbar">
-    <div class="logo">🚇 MetroFare</div>
-    <ul>
-        <li><a href="#">Home</a></li>
-        <li><a href="#calculator">Fare Calculator</a></li>
-        <li><a href="#about">About</a></li>
-    </ul>
+<nav class="navbar" id="navbar">
+  <div class="nav-brand">
+    <span class="brand-icon">🚇</span>
+    <span class="brand-name">MetroFare</span>
+    <span class="brand-badge">BETA</span>
+  </div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#home" class="nav-link active">Home</a></li>
+    <li><a href="#calculator" class="nav-link">Calculator</a></li>
+    <li><a href="#map" class="nav-link">Map</a></li>
+    <li><a href="#dashboard" class="nav-link">Dashboard</a></li>
+    <li><a href="#about" class="nav-link">About</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+      <span class="theme-icon">🌙</span>
+    </button>
+    <button class="voice-btn" id="voiceBtn" title="Voice search">
+      <span>🎙️</span>
+    </button>
+    <button class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
 </nav>
 
 <!-- HERO -->
-<section class="hero">
-    <h1>🚇 Metro Navigation System</h1>
-    <p>Find routes, fares and stations in real-time</p>
+<section class="hero" id="home">
+  <div class="hero-bg">
+    <video autoplay muted loop playsinline id="bg-video" class="hero-video">
+      <source src="metrovedio.mp4" type="video/mp4">
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="hero-grid"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge animate-fade-in">🚇 Bengaluru Namma Metro</div>
+    <h1 class="hero-title animate-slide-up">
+      Navigate <span class="gradient-text">Smarter</span>,<br>Travel <span class="gradient-text">Faster</span>
+    </h1>
+    <p class="hero-subtitle animate-slide-up delay-1">Real-time routes · Smart fare calculation · Live tracking simulation</p>
+    <div class="hero-actions animate-slide-up delay-2">
+      <a href="#calculator" class="btn btn-primary">Plan My Journey</a>
+      <a href="#map" class="btn btn-ghost">View Live Map</a>
+    </div>
+    <div class="hero-stats animate-fade-in delay-3">
+      <div class="stat-item"><span class="stat-num">57</span><span class="stat-label">Stations</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><span class="stat-num">42.3</span><span class="stat-label">km Network</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><span class="stat-num">2</span><span class="stat-label">Lines</span></div>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <div class="scroll-dot"></div>
+    <span>Scroll to explore</span>
+  </div>
 </section>
 
-<!-- CALCULATOR -->
+<!-- SEARCH BAR FLOATING -->
+<div class="floating-search" id="floatingSearch">
+  <div class="search-container">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="globalSearch" placeholder="Search any station..." autocomplete="off">
+    <button class="search-clear" id="searchClear">✕</button>
+  </div>
+  <div class="search-suggestions" id="searchSuggestions"></div>
+</div>
+
+<!-- LIVE STATUS BAR -->
+<div class="status-bar">
+  <div class="status-item">
+    <span class="status-dot green"></span>
+    <span>Purple Line: Operational</span>
+  </div>
+  <div class="status-item">
+    <span class="status-dot green"></span>
+    <span>Green Line: Operational</span>
+  </div>
+  <div class="status-item">
+    <span class="status-dot amber"></span>
+    <span>Next train: <strong id="nextTrainTime">4 min</strong></span>
+  </div>
+  <div class="status-item status-time">
+    <span id="currentTime">--:--</span>
+  </div>
+</div>
+
+<!-- CALCULATOR SECTION -->
 <section id="calculator" class="calculator-section">
+  <div class="section-header">
+    <h2 class="section-title">Fare Calculator</h2>
+    <p class="section-sub">Find the best route between any two stations</p>
+  </div>
 
-    <!-- VIDEO BACKGROUND -->
-    <video autoplay muted loop playsinline id="bg-video">
-        <source src="metrovedio.mp4" type="video/mp4">
-    </video>
+  <div class="calculator-layout">
+    <!-- MAIN CALCULATOR CARD -->
+    <div class="calc-card glass-card">
+      <div class="calc-header">
+        <div class="calc-tab active" data-tab="route">🗺️ Route Planner</div>
+        <div class="calc-tab" data-tab="ticket">🎫 Quick Ticket</div>
+      </div>
 
-    <!-- CARD -->
-    <div class="card">
-        <h2>Fare Calculator</h2>
+      <div class="calc-body" id="routeTab">
+        <div class="station-input-group">
+          <div class="station-field">
+            <label class="field-label">
+              <span class="dot dot-green"></span> From Station
+            </label>
+            <div class="select-wrapper">
+              <select id="from" class="station-select"></select>
+            </div>
+          </div>
 
-        <label>From Station</label>
-        <select id="from"></select>
+          <button class="swap-btn" onclick="swapStations()" title="Swap stations">
+            <span class="swap-icon">⇄</span>
+          </button>
 
-        <label>To Station</label>
-        <select id="to"></select>
+          <div class="station-field">
+            <label class="field-label">
+              <span class="dot dot-red"></span> To Station
+            </label>
+            <div class="select-wrapper">
+              <select id="to" class="station-select"></select>
+            </div>
+          </div>
+        </div>
 
-        <button onclick="swapStations()">⇄ Swap Stations</button>
-        <button onclick="calculateFare()">Calculate Fare</button>
-        <button onclick="clearData()">Clear</button>
-        <button onclick="playWelcome()">🔊 Play Welcome</button>
+        <div class="time-selector">
+          <label class="field-label">Departure Time</label>
+          <input type="time" id="departureTime" class="time-input">
+          <label class="field-label" style="margin-left:16px;">Passengers</label>
+          <div class="passenger-counter">
+            <button onclick="changePassengers(-1)">−</button>
+            <span id="passengerCount">1</span>
+            <button onclick="changePassengers(1)">+</button>
+          </div>
+        </div>
 
-        <div id="result" class="result-box"></div>
+        <div class="route-options">
+          <label class="route-option active" data-pref="fastest">
+            <input type="radio" name="routePref" value="fastest" checked>
+            <span class="option-icon">⚡</span>
+            <span>Fastest</span>
+          </label>
+          <label class="route-option" data-pref="shortest">
+            <input type="radio" name="routePref" value="shortest">
+            <span class="option-icon">📏</span>
+            <span>Shortest</span>
+          </label>
+          <label class="route-option" data-pref="leastchange">
+            <input type="radio" name="routePref" value="leastchange">
+            <span class="option-icon">🔁</span>
+            <span>Least Interchange</span>
+          </label>
+        </div>
+
+        <div class="calc-actions">
+          <button class="btn btn-primary full-width" onclick="calculateFare()">
+            <span>Calculate Route & Fare</span>
+            <span class="btn-arrow">→</span>
+          </button>
+          <button class="btn btn-ghost" onclick="clearData()">Clear</button>
+          <button class="btn btn-ghost" onclick="playWelcome()">🔊 Audio</button>
+        </div>
+      </div>
+
+      <div class="calc-body hidden" id="ticketTab">
+        <div class="ticket-preview">
+          <div class="ticket-card">
+            <div class="ticket-header">
+              <span>🚇 Namma Metro</span>
+              <span class="ticket-type">Smart Card</span>
+            </div>
+            <div class="ticket-route">
+              <span id="ticketFrom">-</span>
+              <span class="ticket-arrow">→</span>
+              <span id="ticketTo">-</span>
+            </div>
+            <div class="ticket-footer">
+              <span id="ticketFare">₹0</span>
+              <div class="qr-placeholder">QR</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <!-- RESULT PANEL -->
+    <div class="result-panel glass-card" id="resultPanel">
+      <div class="result-placeholder" id="resultPlaceholder">
+        <div class="placeholder-icon">🗺️</div>
+        <p>Select stations and calculate to see route details</p>
+      </div>
+      <div class="result-content hidden" id="resultContent">
+        <!-- filled by JS -->
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- AUDIO -->
-<audio id="welcomeAudio">
-    <source src="welcome.mp3" type="audio/mpeg">
-</audio>
+<!-- ROUTE VISUALIZATION -->
+<div class="route-viz hidden" id="routeViz">
+  <div class="route-timeline" id="routeTimeline"></div>
+</div>
 
-<!-- MAP -->
-<section class="map">
-    <h2>Metro Map</h2>
-    <div id="map"></div>
+<!-- MAP SECTION -->
+<section class="map-section" id="map">
+  <div class="section-header">
+    <h2 class="section-title">Live Metro Map</h2>
+    <p class="section-sub">Real-time visualization of the Bengaluru Metro network</p>
+  </div>
+  <div class="map-wrapper">
+    <div id="mapEl"></div>
+    <div class="map-legend">
+      <div class="legend-item"><span class="legend-dot purple"></span> Purple Line</div>
+      <div class="legend-item"><span class="legend-dot green"></span> Green Line</div>
+      <div class="legend-item"><span class="legend-dot red"></span> Selected Route</div>
+    </div>
+  </div>
+</section>
+
+<!-- DASHBOARD -->
+<section class="dashboard-section" id="dashboard">
+  <div class="section-header">
+    <h2 class="section-title">Your Dashboard</h2>
+    <p class="section-sub">Track your journeys and favourite routes</p>
+  </div>
+  <div class="dashboard-grid">
+    <div class="dash-card glass-card">
+      <h3 class="dash-card-title">📊 Travel Stats</h3>
+      <div class="stats-grid">
+        <div class="mini-stat">
+          <span class="mini-num" id="totalTrips">0</span>
+          <span class="mini-label">Trips</span>
+        </div>
+        <div class="mini-stat">
+          <span class="mini-num" id="totalFare">₹0</span>
+          <span class="mini-label">Total Fare</span>
+        </div>
+        <div class="mini-stat">
+          <span class="mini-num" id="totalKm">0</span>
+          <span class="mini-label">km Travelled</span>
+        </div>
+        <div class="mini-stat">
+          <span class="mini-num" id="savedRoutes">0</span>
+          <span class="mini-label">Saved Routes</span>
+        </div>
+      </div>
+    </div>
+    <div class="dash-card glass-card">
+      <h3 class="dash-card-title">🕓 Recent Journeys</h3>
+      <div class="journey-list" id="journeyList">
+        <p class="empty-state">No journeys yet. Calculate a route to get started!</p>
+      </div>
+    </div>
+    <div class="dash-card glass-card">
+      <h3 class="dash-card-title">⭐ Favourite Routes</h3>
+      <div class="fav-list" id="favList">
+        <p class="empty-state">Save routes from the calculator above.</p>
+      </div>
+    </div>
+    <div class="dash-card glass-card">
+      <h3 class="dash-card-title">🏆 Top Stations</h3>
+      <div class="top-stations" id="topStations">
+        <div class="top-station-item"><span>MG Road</span><div class="usage-bar" style="width:80%"></div></div>
+        <div class="top-station-item"><span>Majestic</span><div class="usage-bar" style="width:65%"></div></div>
+        <div class="top-station-item"><span>Indiranagar</span><div class="usage-bar" style="width:50%"></div></div>
+        <div class="top-station-item"><span>Whitefield</span><div class="usage-bar" style="width:35%"></div></div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- ABOUT -->
-<section id="about" class="about">
-    <h2>About Project</h2>
-    <p>
-        This Metro Navigation System uses real station data, interactive maps, 
-        and route calculation to simulate a real metro system.
-    </p>
+<section id="about" class="about-section">
+  <div class="about-grid">
+    <div class="about-text">
+      <h2>About MetroFare</h2>
+      <p>MetroFare is a portfolio-grade metro navigation simulation for Bengaluru's Namma Metro network. Built with modern web technologies, it provides real-time route calculations, fare estimation, and interactive maps.</p>
+      <div class="tech-stack">
+        <span class="tech-badge">HTML5</span>
+        <span class="tech-badge">CSS3</span>
+        <span class="tech-badge">Vanilla JS</span>
+        <span class="tech-badge">Leaflet</span>
+        <span class="tech-badge">Dijkstra</span>
+        <span class="tech-badge">PWA</span>
+      </div>
+    </div>
+    <div class="feature-list">
+      <div class="feature-item">⚡ Dijkstra Route Algorithm</div>
+      <div class="feature-item">💰 Dynamic Fare Calculation</div>
+      <div class="feature-item">📍 Geolocation Detection</div>
+      <div class="feature-item">🎙️ Voice Search</div>
+      <div class="feature-item">🌙 Dark / Light Mode</div>
+      <div class="feature-item">📱 PWA Ready</div>
+    </div>
+  </div>
 </section>
 
-<!-- DATA FILE -->
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <span>🚇 MetroFare · Built for Bengaluru</span>
+    <span class="footer-sep">·</span>
+    <span>Portfolio Project</span>
+  </div>
+</footer>
+
+<!-- AUDIO -->
+<audio id="welcomeAudio"><source src="welcome.mp3" type="audio/mpeg"></audio>
+
+<!-- TOAST NOTIFICATIONS -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- SCRIPTS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="station.js"></script>
-
-<!-- MAIN SCRIPT -->
 <script src="script.js"></script>
-
 </body>
 </html>
